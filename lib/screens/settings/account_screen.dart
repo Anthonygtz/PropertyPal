@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/auth_service.dart';
+import 'change_password.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({Key? key});
@@ -21,6 +22,29 @@ class _AccountState extends State<AccountScreen> {
   }
 
   @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('Account'),
+  //     ),
+  //     body: _user != null
+  //         ? Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: <Widget>[
+  //         buildListTile("Change Password", () {
+  //           // Handle change password
+  //         }),
+  //         buildListTile("Delete Account", () {
+  //           showDeleteConfirmationDialog(context, _authService);
+  //         }),
+  //       ],
+  //     )
+  //         : Center(
+  //       child: CircularProgressIndicator(),
+  //     ),
+  //   );
+  // }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -31,7 +55,12 @@ class _AccountState extends State<AccountScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           buildListTile("Change Password", () {
-            showChangePasswordDialog(context, _authService);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChangePasswordScreen(),
+              ),
+            );
           }),
           buildListTile("Delete Account", () {
             showDeleteConfirmationDialog(context, _authService);
@@ -58,47 +87,6 @@ class _AccountState extends State<AccountScreen> {
           thickness: 1,
         ),
       ],
-    );
-  }
-
-  void showChangePasswordDialog(BuildContext context, AuthService authService) {
-    TextEditingController newPasswordController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Change Password"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                controller: newPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'New Password',
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () async {
-                String newPassword = newPasswordController.text;
-                await authService.changePassword(context, newPassword);
-                Navigator.of(context).pop();
-              },
-              child: Text("Change Password"),
-            ),
-          ],
-        );
-      },
     );
   }
 

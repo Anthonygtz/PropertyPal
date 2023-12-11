@@ -3,12 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:propertypal/screens/dashboard.dart';
 import 'package:propertypal/screens/login_screens.dart';
-
 import 'db.dart';
 
-class AuthService{
+class AuthService {
   var db = Db();
-  createUser(data, context) async {
+
+  Future<void> createUser(Map<String, dynamic> data, BuildContext context) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: data['email'],
@@ -20,18 +20,18 @@ class AuthService{
       );
     } catch (e) {
       showDialog(
-          context: context,
-          builder: (context){
-            return AlertDialog(
-              title: Text("Sign up Failed"),
-              content: Text(e.toString()),
-            );
-          }
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Sign up Failed"),
+            content: Text(e.toString()),
+          );
+        },
       );
     }
   }
 
-  login(data, context) async {
+  Future<void> login(Map<String, dynamic> data, BuildContext context) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: data['email'],
@@ -42,13 +42,13 @@ class AuthService{
       );
     } catch (e) {
       showDialog(
-          context: context,
-          builder: (context){
-            return AlertDialog(
-              title: Text("Login Error"),
-              content: Text(e.toString()),
-            );
-          }
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Login Error"),
+            content: Text(e.toString()),
+          );
+        },
       );
     }
   }
@@ -56,13 +56,16 @@ class AuthService{
   Future<void> deleteAccount(BuildContext context) async {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     var userID = FirebaseAuth.instance.currentUser!.uid;
-    DocumentReference documentReference = FirebaseFirestore.instance.collection('users').doc(userID);
-
+    DocumentReference documentReference =
+    FirebaseFirestore.instance.collection('users').doc(userID);
+    CollectionReference collectionReference =
+    FirebaseFirestore.instance.collection('users').doc(userID).collection('properties');
 
     User user = FirebaseAuth.instance.currentUser!;
     try {
       await user.delete();
       await documentReference.delete();
+      await collectionReference.parent!.delete();
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Login()));
     } catch (e) {
       showDialog(
@@ -77,64 +80,20 @@ class AuthService{
     }
   }
 
-  Future<void> changePassword(BuildContext context, String newPassword) async {
+  Future<void> changePassword(String oldPassword, String newPassword) async {
     User? user = FirebaseAuth.instance.currentUser;
-
     if (user != null) {
       try {
-        // Change the password in Firebase Authentication
-        await user.updatePassword(newPassword);
-
-        // Update the password in Firestore for the current user
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .update({'password': newPassword})
-            .then((_) {
-          // Show a success dialog
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text("Password Changed"),
-                content: Text("Your password has been changed successfully."),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("OK"),
-                  ),
-                ],
-              );
-            },
-          );
-        }).catchError((error) {
-          // Show a dialog if there's an error updating Firestore
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text("Password Change Failed"),
-                content: Text(error.toString()),
-              );
-            },
-          );
-        });
-      } catch (e) {
-        // Show a dialog if there's an error changing the password in Firebase Authentication
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("Password Change Failed"),
-              content: Text(e.toString()),
-            );
-          },
+        AuthCredential credential = EmailAuthProvider.credential(
+          email: user.email!,
+          password: oldPassword,
         );
+        await user.reauthenticateWithCredential(credential);
+        await user.updatePassword(newPassword);
+      } catch (e) {
+        rethrow;
       }
     }
   }
-
-
 }
+

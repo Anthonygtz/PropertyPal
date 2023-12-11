@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:propertypal/screens/settings/currency_screen.dart';
 import 'package:propertypal/screens/settings/account_screen.dart';
 import '../login_screens.dart';
+import 'package:propertypal/screens/notification/notification.dart';
+
+
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key});
@@ -11,10 +13,10 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsState();
 }
 
+
 class _SettingsState extends State<SettingsScreen> {
   var isLogoutLoading = false;
   bool receiveNotifications = true;
-  String metricMeasurement = 'm²';
 
   Future<void> logOut() async {
     setState(() {
@@ -41,7 +43,6 @@ class _SettingsState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           buildListTile("Account"),
-          buildListTile("Currency"),
           buildToggleListTileWithLabels(
             "Notifications",
             receiveNotifications,
@@ -51,7 +52,6 @@ class _SettingsState extends State<SettingsScreen> {
               });
             },
           ),
-          buildToggleMetricMeasurementListTile(),
           buildListTileWithLogout("Log Out"),
         ],
       ),
@@ -66,8 +66,6 @@ class _SettingsState extends State<SettingsScreen> {
           onTap: () {
             if (title == "Account") {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => AccountScreen()));
-            } else if (title == "Currency") {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => CurrencyScreen()));
             } else if (title == "Log Out") {
               showLogoutConfirmationDialog(context);
             }
@@ -134,36 +132,6 @@ class _SettingsState extends State<SettingsScreen> {
         ),
         Divider(
           color: Colors.grey.shade400,
-          height: 0,
-          thickness: 1,
-        ),
-      ],
-    );
-  }
-
-  Widget buildToggleMetricMeasurementListTile() {
-    return Column(
-      children: [
-        ListTile(
-          title: Text("Metric Measurements"),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('FT²'),
-              Switch(
-                value: metricMeasurement == 'FT²',
-                onChanged: (bool value) {
-                  setState(() {
-                    metricMeasurement = value ? 'FT²' : 'M²';
-                  });
-                },
-              ),
-              Text('M²'),
-            ],
-          ),
-        ),
-        Divider(
-          color: Colors.grey.shade500,
           height: 0,
           thickness: 1,
         ),

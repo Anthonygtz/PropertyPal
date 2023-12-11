@@ -3,11 +3,8 @@ import 'package:propertypal/screens/login_screens.dart';
 import 'package:propertypal/services/auth_service.dart';
 import 'package:propertypal/utils/appvalidator.dart';
 
-import 'dashboard.dart';
-
 class SignUp extends StatefulWidget {
   SignUp({super.key});
-
   @override
   State<SignUp> createState() => _SignUpState();
 }
@@ -32,12 +29,6 @@ class _SignUpState extends State<SignUp> {
         "name": _nameController.text,
         "email": _emailController.text,
         "password": _passwordController.text,
-        // 'propertyName': " ",
-        // 'propertyAddress': " ",
-        // 'tenantName': " ",
-        // 'tenantPhone': " ",
-        // 'tenantEmail': " ",
-        // 'rent': 0
       };
 
       await authService.createUser(data, context);
@@ -45,9 +36,9 @@ class _SignUpState extends State<SignUp> {
       setState(() {
         isLoader = false;
       });
-      // ScaffoldMessenger.of(_formKey.currentContext!).showSnackBar(
-      //   const SnackBar(content: Text("Form submitted successfully"))
-      // );
+      ScaffoldMessenger.of(_formKey.currentContext!).showSnackBar(
+        const SnackBar(content: Text("Welcome to PropertyPal"))
+      );
     }
   }
 

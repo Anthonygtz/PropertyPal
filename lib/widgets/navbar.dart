@@ -23,12 +23,10 @@ class NavBar extends StatelessWidget {
           label: 'Reminder',
         ),
         NavigationDestination(
-          selectedIcon: Icon(Icons.school),
           icon: Icon(Icons.bar_chart),
           label: 'Reports',
         ),
         NavigationDestination(
-          selectedIcon: Icon(Icons.school),
           icon: Icon(Icons.settings),
           label: 'Settings',
         ),
